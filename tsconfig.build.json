@@ -11,7 +11,7 @@
     "src/users/**/*",
     "src/auth/**/*",
     "src/gamification/**/*",
-    "src/subscription/**/*"
+    "src/subscription/**/*",
+    "src/measurements/**/*"
   ]
-}
 
