@@ -1,0 +1,117 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+
+}
+
+enum Role {
+  USER
+  ADMIN
+}
+
+enum SubscriptionPlan {
+  FREE
+  BASIC
+  PREMIUM
+  FULL_SERVICE
+}
+
+model User {
+  id        String   @id @default(uuid())
+  email     String   @unique
+  password  String
+  name      String?
+  role      Role     @default(USER)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  stripeCustomerId String?
+
+  subscription Subscription?
+  pools        Pool[]
+  measurements Measurement[]
+  badges       UserBadge[]
+  actions      UserAction[]
+  streak       Streak?
+}
+
+model Subscription {
+  id               String           @id @default(uuid())
+  userId           String           @unique
+  user             User             @relation(fields: [userId], references: [id])
+  plan             SubscriptionPlan @default(FREE)
+  status           String           // active, canceled, past_due
+  currentPeriodEnd DateTime
+  createdAt        DateTime         @default(now())
+  updatedAt        DateTime         @updatedAt
+}
+
+model Pool {
+  id           String        @id @default(uuid())
+  userId       String
+  user         User          @relation(fields: [userId], references: [id])
+  name         String?
+  volume       Float
+  type         String        // e.g., "Enterrée", "Hors-sol"
+  treatment    String        // "Chlore", "Sel", etc.
+  hasHeatPump  Boolean       @default(false)
+  exposure     String?       // "Plein soleil", etc.
+  measurements Measurement[]
+  createdAt    DateTime      @default(now())
+  updatedAt    DateTime      @updatedAt
+}
+
+model Measurement {
+  id         String   @id @default(uuid())
+  poolId     String
+  pool       Pool     @relation(fields: [poolId], references: [id])
+  userId     String
+  user       User     @relation(fields: [userId], references: [id])
+  ph         Float
+  tac        Float
+  chlorine   Float
+  stabilizer Float
+  photoUrl   String?
+  advice     String?  @db.Text
+  createdAt  DateTime @default(now())
+}
+
+model Badge {
+  id          String      @id @default(uuid())
+  name        String      @unique
+  description String
+  imageUrl    String?
+  users       UserBadge[]
+}
+
+model UserBadge {
+  id        String   @id @default(uuid())
+  userId    String
+  user      User     @relation(fields: [userId], references: [id])
+  badgeId   String
+  badge     Badge    @relation(fields: [badgeId], references: [id])
+  earnedAt  DateTime @default(now())
+
+  @@unique([userId, badgeId])
+}
+
+model UserAction {
+  id        String   @id @default(uuid())
+  userId    String
+  user      User     @relation(fields: [userId], references: [id])
+  type      String   // "TEST_DONE", "PROTOCOL_APPLIED", etc.
+  points    Int
+  createdAt DateTime @default(now())
+}
+
+model Streak {
+  id             String   @id @default(uuid())
+  userId         String   @unique
+  user           User     @relation(fields: [userId], references: [id])
+  currentStreak  Int      @default(0)
+  lastActivityAt DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+}
