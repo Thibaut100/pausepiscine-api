@@ -5,11 +5,13 @@ export class HealthController {
   @Get('health')
   health() {
     return {
-      ok: true,
-      service: 'pausepiscine-api',
-      env: process.env.NODE_ENV ?? 'unknown',
-      uptime: process.uptime(),
-      timestamp: new Date().toISOString(),
-    };
+  ok: true,
+  service: 'pausepiscine-api',
+  env: process.env.NODE_ENV ?? 'unknown',
+  appEnv: process.env.APP_ENV ?? 'unknown',
+  uptime: process.uptime(),
+  timestamp: new Date().toISOString(),
+};
+
   }
 }
