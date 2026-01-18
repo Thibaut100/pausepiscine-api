@@ -1,3 +1,5 @@
+import { HealthController } from './health.controller';
+import { ApiController } from './api.controller';
 import { Module } from '@nestjs/common';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
@@ -10,7 +12,7 @@ import { VisionModule } from './vision/vision.module';
     VisionModule,
     // ❌ PAS de PrismaModule ici pour l’instant
   ],
-  controllers: [AppController],
+  controllers: [AppController, HealthController, ApiController],
   providers: [AppService],
 })
 export class AppModule {}
